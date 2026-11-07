@@ -12,10 +12,32 @@ Secondary descriptive analysis of publicly reported CMS program and evaluation f
 
 The included MSSP participation snapshots and final performance-year counts use different reporting bases. GPDC is the predecessor of ACO REACH. BPCI Advanced savings are evaluation estimates, unlike MSSP and ACO REACH benchmark settlements.
 
+## Figures
+
+The figures below are committed in `figures/` and display directly on GitHub. They summarize reported data; financial measures are not comparable across models.
+
+### Participation
+
+![MSSP participation](figures/mssp_participation.svg)
+
+![GPDC and ACO REACH participation](figures/reach_participation.svg)
+
+### Financial performance
+
+![MSSP net savings per beneficiary](figures/mssp_per_capita.svg)
+
+![ACO REACH savings relative to benchmarks](figures/reach_benchmark_savings.svg)
+
+![BPCI Advanced published evaluation savings](figures/bpci_evaluation_savings.svg)
+
+### Quality
+
+![ACO REACH timely follow-up](figures/reach_quality_trend.svg)
+
 ## Run
 ```bash
 pip install pandas matplotlib
-python apm-descriptive-comparison/analyze.py
+python analyze.py
 ```
 
 Outputs: participation trends, model-specific financial plots, a REACH quality trend, and source-linked CSV tables.
