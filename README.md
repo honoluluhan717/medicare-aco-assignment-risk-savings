@@ -10,7 +10,7 @@ The quantitative analysis covers **MSSP 2024**, **ACO REACH 2022–2023**, and *
 
 **Original CMS dataset:** [MSSP Performance Year 2024 Financial and Quality Results](https://www.cms.gov/medicare/payment/fee-for-service-providers/shared-savings-program-ssp-acos/data), revised July 17, 2026.
 
-The original CSV is included under [`data/raw/`](data/raw/). It contains ACO-level records, including agreement characteristics, beneficiary counts, financial reconciliation, and quality measures. The MSSP analysis uses the original CMS ACO-level CSV. For ACO REACH and BPCI Advanced, the analysis uses small **source-extracted tables** whose published figures were checked against the CMS fact sheet and final evaluation. These are explicitly not original participant-level raw files. They are stored in [\`data/source_extracted/\`](data/source_extracted/).
+The original CSV is included under [`data/raw/`](data/raw/). It contains ACO-level records, including agreement characteristics, beneficiary counts, financial reconciliation, and quality measures. The MSSP analysis uses the original CMS ACO-level CSV. For ACO REACH and BPCI Advanced, the analysis uses small **source-extracted tables** whose published figures were checked against the CMS fact sheet and final evaluation. These are explicitly not original participant-level raw files. They are stored in [`data/source_extracted/`](data/source_extracted/).
 
 For program context, see the CMS pages for [ACO REACH](https://www.cms.gov/priorities/innovation/innovation-models/aco-reach) and [BPCI Advanced](https://www.cms.gov/priorities/innovation/innovation-models/bpci-advanced).
 
@@ -24,6 +24,8 @@ The Python script `analyze.py` reads the original CMS CSV directly, validates th
 - ACO-level missingness checks
 - Savings-rate versus quality-score scatterplot and Pearson correlation
 - Ten ACOs with the largest positive benchmark differences
+
+For **ACO REACH**, the script uses CMS PY2023 fact-sheet values for benchmark savings, financial settlement status, and timely follow-up. For **BPCI Advanced**, it uses the CMS final evaluation estimates with 90% confidence intervals. BPCI model years 7–8 are flagged by CMS as potentially overestimated because of differences in evaluation data and methods.
 
 The outputs are saved to `results/` (CSV tables) and `figures/` (PNG charts) when the script is executed. Results are computed from the source file rather than hard-coded in this README.
 
