@@ -34,5 +34,6 @@ jobs:
           git add results/ figures/
           if ! git diff --cached --quiet; then
             git commit -m "Generate CMS-source-based analysis outputs"
+            git pull --rebase origin main
             git push
           fi
