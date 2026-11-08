@@ -1,0 +1,11 @@
+model,year,metric,value,unit,source_url
+ACO REACH,2022,cms_net_benchmark_savings,371.5,USD millions,https://www.cms.gov/priorities/innovation/aco-reach-py2023-financial-and-quality-performance-results-fact-sheet
+ACO REACH,2023,cms_net_benchmark_savings,694.6,USD millions,https://www.cms.gov/priorities/innovation/aco-reach-py2023-financial-and-quality-performance-results-fact-sheet
+ACO REACH,2023,gross_benchmark_savings,1643,USD millions,https://www.cms.gov/priorities/innovation/aco-reach-py2023-financial-and-quality-performance-results-fact-sheet
+ACO REACH,2023,participant_acos,132,ACOs,https://www.cms.gov/priorities/innovation/aco-reach-py2023-financial-and-quality-performance-results-fact-sheet
+ACO REACH,2023,acos_with_net_savings,96,ACOs,https://www.cms.gov/priorities/innovation/aco-reach-py2023-financial-and-quality-performance-results-fact-sheet
+ACO REACH,2023,acos_with_net_losses,36,ACOs,https://www.cms.gov/priorities/innovation/aco-reach-py2023-financial-and-quality-performance-results-fact-sheet
+ACO REACH,2022,timely_followup_standard_new_entrant,68.31,percent,https://www.cms.gov/priorities/innovation/aco-reach-py2023-financial-and-quality-performance-results-fact-sheet
+ACO REACH,2023,timely_followup_standard_new_entrant,71.80,percent,https://www.cms.gov/priorities/innovation/aco-reach-py2023-financial-and-quality-performance-results-fact-sheet
+ACO REACH,2023,mean_quality_score_standard_new_entrant,78.55,percent,https://www.cms.gov/priorities/innovation/aco-reach-py2023-financial-and-quality-performance-results-fact-sheet
+ACO REACH,2023,mean_quality_score_high_needs,86.73,percent,https://www.cms.gov/priorities/innovation/aco-reach-py2023-financial-and-quality-performance-results-fact-sheet
