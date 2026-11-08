@@ -1,7 +1,8 @@
 """Source-first Medicare APM analysis.
 
-Quantitative outputs use only the original CMS MSSP PY2024 ACO-level CSV.
-Other APMs are compared descriptively; no incompatible savings metrics are pooled.
+MSSP uses the original CMS PY2024 ACO-level CSV.
+ACO REACH and BPCI Advanced use source-extracted published CMS figures.
+Incompatible financial measures are not pooled.
 """
 from pathlib import Path
 import pandas as pd
@@ -128,7 +129,8 @@ def analyze_bpci():
               list(data.ci90_upper_millions - vals)]
     ax.bar(x, vals)
     ax.errorbar(x, vals, yerr=errors, fmt="none", capsize=5, color="black")
-    ax.set_xticks(x)\n    ax.set_xticklabels(data.period)
+    ax.set_xticks(x)
+    ax.set_xticklabels(data.period)
     ax.axhline(0, color="black", linewidth=0.8)
     ax.set_title("BPCI Advanced: estimated net Medicare savings (90% CI)")
     ax.set_ylabel("USD millions")
