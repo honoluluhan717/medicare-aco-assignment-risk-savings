@@ -1,4 +1,4 @@
-"""Three Medicare payment models: a small descriptive analysis of CMS data."""
+"""MSSP 2024: assigned beneficiaries, risk scores, and savings rates."""
 from pathlib import Path
 
 import matplotlib
@@ -6,75 +6,73 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-BASE = Path(__file__).resolve().parent
-DATA = BASE / "data"
-FIG = BASE / "figures"
-RESULTS = BASE / "results"
-MSSP = DATA / "raw" / "PY_Financial_and_Quality_Results_2024_revised 2026_07_17.csv"
+root = Path(__file__).resolve().parent
+source = root / "data/raw/PY_Financial_and_Quality_Results_2024_revised 2026_07_17.csv"
+figures = root / "figures"
+results = root / "results"
+figures.mkdir(exist_ok=True)
+results.mkdir(exist_ok=True)
 
+# CMS reports ACO-level results, not individual beneficiary records.
+df = pd.read_csv(source, low_memory=False)
+columns = ["ACO_ID", "N_AB", "Assign_Type", "Sav_rate", "CMS_HCC_RiskScore_AGND_PY"]
+missing = set(columns) - set(df.columns)
+if missing:
+    raise ValueError(f"Missing CMS fields: {sorted(missing)}")
+if df["ACO_ID"].isna().any() or df["ACO_ID"].duplicated().any():
+    raise ValueError("Missing or duplicate ACO identifiers")
 
-def chart(x, y, title, ylabel, filename, errors=None):
-    fig, ax = plt.subplots(figsize=(7, 4))
-    ax.bar(range(len(x)), y, color="#416b86")
-    if errors is not None:
-        ax.errorbar(range(len(x)), y, yerr=errors, fmt="none", color="black", capsize=4)
-    ax.set_xticks(range(len(x)))
-    ax.set_xticklabels([str(item) for item in x])
-    ax.set_ylabel(ylabel)
-    ax.set_title(title)
-    ax.axhline(0, color="#555555", linewidth=0.7)
-    fig.tight_layout()
-    fig.savefig(FIG / filename, dpi=150)
-    plt.close(fig)
+for name in ["N_AB", "Sav_rate", "CMS_HCC_RiskScore_AGND_PY"]:
+    df[name] = pd.to_numeric(df[name].replace("-", pd.NA), errors="coerce")
 
+# 1. ACO size and savings rate
+size = df.dropna(subset=["N_AB", "Sav_rate"])
+size = size[size["N_AB"] > 0]
+plt.figure(figsize=(7, 4))
+plt.scatter(size["N_AB"], size["Sav_rate"], alpha=0.45)
+plt.xlabel("Assigned beneficiaries (N_AB)")
+plt.ylabel("CMS-reported savings rate (%)")
+plt.title("ACO size and savings rate")
+plt.tight_layout()
+plt.savefig(figures / "01_size_and_savings.png", dpi=150)
+plt.close()
 
-def main():
-    FIG.mkdir(exist_ok=True)
-    RESULTS.mkdir(exist_ok=True)
+# 2. Risk score and savings rate for aged, non-dual beneficiaries.
+# This is a subgroup risk score, NOT an overall ACO risk score.
+risk_col = "CMS_HCC_RiskScore_AGND_PY"
+risk = df.dropna(subset=[risk_col, "Sav_rate"])
+plt.figure(figsize=(7, 4))
+plt.scatter(risk[risk_col], risk["Sav_rate"], alpha=0.45)
+plt.xlabel("CMS-HCC risk score: aged, non-dual beneficiaries")
+plt.ylabel("CMS-reported savings rate (%)")
+plt.title("Reported risk score and savings rate")
+plt.tight_layout()
+plt.savefig(figures / "02_risk_and_savings.png", dpi=150)
+plt.close()
 
-    # Original CMS ACO-level financial and quality results, PY2024.
-    mssp = pd.read_csv(MSSP, low_memory=False)
-    required = {"ACO_ID", "Risk_Model", "BnchmkMinExp", "QualScore"}
-    if not required.issubset(mssp.columns):
-        raise ValueError(f"MSSP source is missing: {sorted(required - set(mssp.columns))}")
-    if mssp["ACO_ID"].duplicated().any():
-        raise ValueError("MSSP file has duplicate ACO IDs")
-    for name in ["BnchmkMinExp", "QualScore"]:
-        mssp[name] = pd.to_numeric(mssp[name].replace("-", pd.NA), errors="coerce")
-    by_risk = (mssp.groupby("Risk_Model", dropna=False)
-               .agg(acos=("ACO_ID", "count"),
-                    mean_quality=("QualScore", "mean"),
-                    benchmark_difference_usd=("BnchmkMinExp", "sum"))
-               .reset_index())
-    by_risk.to_csv(RESULTS / "mssp_by_risk.csv", index=False)
-    chart(by_risk.Risk_Model, by_risk.acos, "MSSP 2024: ACOs by risk model",
-          "Number of ACOs", "01_mssp_risk.png")
+# 3. Compare assignment methods (descriptive, not causal).
+assignment = (df.dropna(subset=["Assign_Type", "Sav_rate"])
+              .groupby("Assign_Type", as_index=False)
+              .agg(acos=("ACO_ID", "count"),
+                   mean_savings_rate=("Sav_rate", "mean")))
+assignment.to_csv(results / "assignment_summary.csv", index=False)
+plt.figure(figsize=(7, 4))
+plt.bar(assignment["Assign_Type"], assignment["mean_savings_rate"])
+plt.xlabel("CMS assignment method")
+plt.ylabel("Mean ACO savings rate (%)")
+plt.title("Savings rate by assignment method")
+plt.tight_layout()
+plt.savefig(figures / "03_assignment_and_savings.png", dpi=150)
+plt.close()
 
-    # CMS REACH PY2023 fact sheet: published aggregate statistics.
-    reach = pd.read_csv(DATA / "reach_cms.csv")
-    assert len(reach) == 2 and reach.year.tolist() == [2022, 2023]
-    reach.to_csv(RESULTS / "reach_summary.csv", index=False)
-    chart(reach.year, reach.cms_net_savings_million,
-          "ACO REACH / GPDC: CMS benchmark net savings",
-          "USD millions", "02_reach_savings.png")
-    chart(reach.year, reach.timely_followup_percent,
-          "ACO REACH / GPDC: timely follow-up",
-          "Percent", "03_reach_quality.png")
-
-    # Independent CMS BPCI Advanced evaluation: DiD-based net savings.
-    bpci = pd.read_csv(DATA / "bpci_cms.csv")
-    assert len(bpci) == 4
-    bpci.to_csv(RESULTS / "bpci_summary.csv", index=False)
-    values = bpci.net_savings_million
-    errors = [list(values - bpci.ci90_lower),
-              list(bpci.ci90_upper - values)]
-    chart(bpci.period, values, "BPCI Advanced: estimated net Medicare savings",
-          "USD millions (90% CI)", "04_bpci_savings.png", errors=errors)
-
-    print(f"MSSP ACOs: {len(mssp)}")
-    print(f"REACH: {len(reach)} reported years; BPCI: {len(bpci)} evaluation periods")
-    print("Wrote four charts and three summary CSVs.")
-
-
-if __name__ == "__main__":
-    main()
+# A small audit table makes missingness and sample sizes visible.
+audit = pd.DataFrame([
+    {"analysis": "ACO size", "acos": len(size)},
+    {"analysis": "Aged non-dual risk score", "acos": len(risk)},
+    {"analysis": "Assignment method", "acos": int(assignment["acos"].sum())},
+])
+audit.to_csv(results / "sample_sizes.csv", index=False)
+print(f"Total ACO records: {len(df)}")
+print(audit.to_string(index=False))
+print(assignment.to_string(index=False))
+print("Saved three charts and two CSV tables.")
