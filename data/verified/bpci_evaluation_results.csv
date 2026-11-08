@@ -1,0 +1,5 @@
+model,period,net_medicare_savings_usd_millions,ci90_lower,ci90_upper,source_url
+BPCI Advanced,MY 1-2,-65.7,-152.0,20.5,https://www.cms.gov/priorities/innovation/data-and-reports/2026/bpci-adv-ar7
+BPCI Advanced,MY 3,-113.7,-207.4,-20.1,https://www.cms.gov/priorities/innovation/data-and-reports/2026/bpci-adv-ar7
+BPCI Advanced,MY 4-6,915.8,745.1,1086.5,https://www.cms.gov/priorities/innovation/data-and-reports/2026/bpci-adv-ar7
+BPCI Advanced,MY 7-8,85.8,61.0,110.6,https://www.cms.gov/priorities/innovation/data-and-reports/2026/bpci-adv-ar7
