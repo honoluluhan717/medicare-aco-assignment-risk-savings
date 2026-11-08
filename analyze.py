@@ -93,7 +93,52 @@ def main():
     df.nlargest(10, "BnchmkMinExp")[["ACO_ID", "ACO_Name", "BnchmkMinExp"]].to_csv(
         OUT / "top_10_benchmark_difference.csv", index=False)
     print(summary.to_string(index=False))
-    print("Saved CMS-source-derived results and figures.")
+    analyze_reach()
+    analyze_bpci()
+    print("Saved MSSP, ACO REACH, and BPCI Advanced source-based results.")
+
+def analyze_reach():
+    """Descriptive CMS fact-sheet measures, not participant-level microdata."""
+    data = pd.read_csv(ROOT / "data/source_extracted/aco_reach_2023_cms_fact_sheet.csv")
+    if data["source_url"].isna().any():
+        raise ValueError("Missing REACH source URL")
+    data.to_csv(OUT / "aco_reach_published_measures.csv", index=False)
+    for metric, filename, title, ylabel in [
+        ("cms_net_benchmark_savings", "reach_benchmark_savings.png",
+         "ACO REACH / GPDC: CMS benchmark net savings", "USD millions"),
+        ("timely_followup_standard_new_entrant", "reach_timely_followup.png",
+         "ACO REACH / GPDC: timely follow-up", "Percent")]:
+        subset = data[data.metric.eq(metric)].copy()
+        save_bar(subset, "year", "value", filename, title, ylabel)
+    totals = data[(data.year == 2023) & data.metric.isin(
+        ["acos_with_net_savings", "acos_with_net_losses"])]
+    save_bar(totals, "metric", "value", "reach_2023_financial_status.png",
+             "ACO REACH: 2023 financial settlement status", "ACOs")
+
+def analyze_bpci():
+    """Evaluation-based DiD net savings; not comparable to benchmark settlements."""
+    data = pd.read_csv(ROOT / "data/source_extracted/bpci_advanced_final_evaluation.csv")
+    if data["source_url"].isna().any():
+        raise ValueError("Missing BPCI source URL")
+    data.to_csv(OUT / "bpci_evaluation_estimates.csv", index=False)
+    fig, ax = plt.subplots(figsize=(9, 5))
+    x = list(range(len(data)))
+    vals = data.net_medicare_savings_millions
+    errors = [list(vals - data.ci90_lower_millions),
+              list(data.ci90_upper_millions - vals)]
+    ax.bar(x, vals)
+    ax.errorbar(x, vals, yerr=errors, fmt="none", capsize=5, color="black")
+    ax.set_xticks(x, data.period)
+    ax.axhline(0, color="black", linewidth=0.8)
+    ax.set_title("BPCI Advanced: estimated net Medicare savings (90% CI)")
+    ax.set_ylabel("USD millions")
+    plt.tight_layout()
+    plt.savefig(FIG / "bpci_evaluation_net_savings.png", dpi=160)
+    plt.close()
+    pd.DataFrame([{"model": "BPCI Advanced",
+                   "total_estimated_net_savings_millions": vals.sum(),
+                   "note": "Sum of reported model-year period estimates; not a pooled CI"}]
+                 ).to_csv(OUT / "bpci_summary.csv", index=False)
 
 if __name__ == "__main__":
     main()
