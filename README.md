@@ -4,13 +4,13 @@
 
 This project examines Medicare alternative payment models (APMs), focusing on how financial accountability, quality reporting, and program design differ across the Medicare Shared Savings Program (MSSP), ACO REACH, and Bundled Payments for Care Improvement Advanced (BPCI Advanced).
 
-The **quantitative analysis currently covers MSSP performance year 2024** using an original CMS ACO-level public-use file. The other two programs are included as contextual comparisons, not pooled into a single financial ranking.
+The quantitative analysis covers **MSSP 2024**, **ACO REACH 2022–2023**, and **BPCI Advanced model years 1–8**, using distinct source types. These programs are compared in design and interpretation, not ranked by incompatible dollar totals.
 
 ## Data source
 
 **Original CMS dataset:** [MSSP Performance Year 2024 Financial and Quality Results](https://www.cms.gov/medicare/payment/fee-for-service-providers/shared-savings-program-ssp-acos/data), revised July 17, 2026.
 
-The original CSV is included under [`data/raw/`](data/raw/). It contains ACO-level records, including agreement characteristics, beneficiary counts, financial reconciliation, and quality measures. No synthetic data or manually transcribed figures are used by the current quantitative analysis.
+The original CSV is included under [`data/raw/`](data/raw/). It contains ACO-level records, including agreement characteristics, beneficiary counts, financial reconciliation, and quality measures. The MSSP analysis uses the original CMS ACO-level CSV. For ACO REACH and BPCI Advanced, the analysis uses small **source-extracted tables** whose published figures were checked against the CMS fact sheet and final evaluation. These are explicitly not original participant-level raw files. They are stored in [\`data/source_extracted/\`](data/source_extracted/).
 
 For program context, see the CMS pages for [ACO REACH](https://www.cms.gov/priorities/innovation/innovation-models/aco-reach) and [BPCI Advanced](https://www.cms.gov/priorities/innovation/innovation-models/bpci-advanced).
 
@@ -33,14 +33,16 @@ The outputs are saved to `results/` (CSV tables) and `figures/` (PNG charts) whe
 
 ## Cross-model context
 
-| Model | Unit of accountability | Core payment approach | Evidence needed for a quantitative comparison |
-| --- | --- | --- | --- |
-| MSSP | Assigned beneficiary population within an ACO | Shared savings and, for some arrangements, downside risk | Original ACO-level CMS financial and quality data (included) |
-| ACO REACH | Aligned beneficiary population within an ACO | Population-based accountability with risk options | Original CMS REACH performance data (not yet incorporated) |
-| BPCI Advanced | Defined clinical episodes | Episode-based target prices and reconciliation | Original CMS evaluation tables and methods (not yet incorporated) |
+| Model | Quantitative evidence | Financial measure |
+| --- | --- | --- |
+| MSSP (2024) | Original CMS ACO-level public-use file | Benchmark difference and shared savings/losses |
+| ACO REACH (2022–2023) | Verified published CMS fact-sheet figures | Savings relative to financial benchmarks |
+| BPCI Advanced (MY1–8) | Verified CMS final evaluation estimates | Estimated net Medicare savings, with 90% confidence intervals |
+
+These estimates have different populations, denominators, model years, and methods. They should not be pooled or interpreted as a head-to-head evaluation.
 
 ## Scope and limitations
 
-This rebuild removes the previous hand-assembled indicator tables and their figures because they had not been fully independently verified against the source publications. It **does not claim** to have completed a numerical three-model comparison. The currently supported quantitative findings are limited to the original MSSP 2024 CMS data.
+This rebuild removes the earlier unverified indicator tables and figures. The new three-model analysis is source-based, but the ACO REACH and BPCI Advanced portions use selected published summary results, not full underlying participant-level files. Consequently, the project does not estimate causal cross-model differences.
 
-The updated analysis code and raw source file are committed. The new outputs have **not yet been executed and checked** in this environment, so the repository does not yet contain regenerated charts or result tables.
+The source files and updated analysis code are committed. New outputs must be executed and checked before they are described as validated results.
