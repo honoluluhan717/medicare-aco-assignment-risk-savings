@@ -8,6 +8,10 @@ on:
       - data/**
       - .github/workflows/generate-analysis.yml
 
+concurrency:
+  group: cms-analysis
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
