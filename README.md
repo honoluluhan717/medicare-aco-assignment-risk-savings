@@ -1,64 +1,46 @@
-# Medicare alternative payment models: descriptive comparison
+# Medicare Alternative Payment Models: CMS Data Analysis
 
 ## Objective
 
-This project reviews publicly reported participation, financial results, and quality indicators for three Medicare alternative payment models: the Medicare Shared Savings Program (MSSP), ACO REACH, and Bundled Payments for Care Improvement Advanced (BPCI Advanced). The aim is to describe changes within each program and document differences in payment design and reporting, rather than estimate program effects.
+This project examines Medicare alternative payment models (APMs), focusing on how financial accountability, quality reporting, and program design differ across the Medicare Shared Savings Program (MSSP), ACO REACH, and Bundled Payments for Care Improvement Advanced (BPCI Advanced).
 
-## Data
+The **quantitative analysis currently covers MSSP performance year 2024** using an original CMS ACO-level public-use file. The other two programs are included as contextual comparisons, not pooled into a single financial ranking.
 
-This project uses publicly available reports and program data from the Centers for Medicare & Medicaid Services (CMS) and the CMS Innovation Center (CMMI). The analysis covers MSSP, ACO REACH (including its GPDC predecessor), and BPCI Advanced. It combines program participation statistics, published financial results, quality indicators, and payment-model design characteristics.
+## Data source
 
-The four **analysis-ready CSV files are included in the `data/` folder**. Their values were extracted from publicly released CMS reports and evaluation summaries; they are not raw beneficiary-level claims or unmodified CMS downloads. Each record includes a `source_url` linking to the underlying public source. Key sources include the [MSSP Fast Facts](https://www.cms.gov/files/document/2025-shared-savings-program-fast-facts.pdf), [2024 MSSP Financial and Quality Results](https://www.cms.gov/files/document/fact-sheet-ssp-py24-financial-and-quality-results.pdf), [ACO REACH financial and quality results](https://www.cms.gov/priorities/innovation/aco-reach-py2023-financial-and-quality-performance-results-fact-sheet), and the [BPCI Advanced evaluation reports](https://www.cms.gov/priorities/innovation/data-and-reports/2026/bpci-adv-ar7).
+**Original CMS dataset:** [MSSP Performance Year 2024 Financial and Quality Results](https://www.cms.gov/medicare/payment/fee-for-service-providers/shared-savings-program-ssp-acos/data), revised July 17, 2026.
 
-| File | Contents |
-| --- | --- |
-| `data/model_design.csv` | Payment unit, attribution, financial arrangements, quality framework, and benchmark methods |
-| `data/participation.csv` | MSSP participation, 2018–2025; GPDC/ACO REACH participation, 2021–2025 |
-| `data/financial_indicators.csv` | Selected program financial measures and BPCI Advanced evaluation estimates |
-| `data/quality_indicators.csv` | Selected reported quality measures and evaluation findings |
+The original CSV is included under [`data/raw/`](data/raw/). It contains ACO-level records, including agreement characteristics, beneficiary counts, financial reconciliation, and quality measures. No synthetic data or manually transcribed figures are used by the current quantitative analysis.
 
-GPDC (2021–2022) is shown as the predecessor to ACO REACH. MSSP January 1 participation snapshots are kept separate from final performance-year results.
-
-### Original CMS public-use data
-
-The repository also includes the unmodified [CMS 2024 MSSP ACO Financial and Quality Results](https://www.cms.gov/medicare/payment/fee-for-service-providers/shared-savings-program-ssp-acos/data) CSV (revised July 17, 2026) in [`data/raw/`](data/raw/). This is the original ACO-level dataset, not a manually assembled table.
-
-**Source verification status:** The four smaller analysis-ready CSV files above were assembled from reported CMS statistics and have not yet been fully checked against their original publications. The existing `analyze.py` still reads those smaller tables, not the newly added raw MSSP CSV. The cross-model analysis should not be treated as source-verified until that work is complete.
+For program context, see the CMS pages for [ACO REACH](https://www.cms.gov/priorities/innovation/innovation-models/aco-reach) and [BPCI Advanced](https://www.cms.gov/priorities/innovation/innovation-models/bpci-advanced).
 
 ## Methods
 
-I summarized model characteristics and plotted available participation, financial, and quality measures within each program. No beneficiary-level data were used. The figures are based on published aggregate values; they do not involve independent risk adjustment or re-estimation of program savings.
+The Python script `analyze.py` reads the original CMS CSV directly, validates the expected columns and ACO identifiers, and produces:
 
-Financial measures require particular care. MSSP and ACO REACH report settlement results relative to program benchmarks, while the BPCI Advanced figures shown here come from a published evaluation. The dollar amounts therefore should not be treated as a common measure of program performance. Quality measures also differ in definition and population across models.
+- ACO counts and financial status (positive, negative, or zero benchmark difference)
+- Aggregate benchmark differences and earned shared savings minus owed losses
+- Financial and quality summaries by risk model and participation track
+- ACO-level missingness checks
+- Savings-rate versus quality-score scatterplot and Pearson correlation
+- Ten ACOs with the largest positive benchmark differences
 
-## Results
+The outputs are saved to `results/` (CSV tables) and `figures/` (PNG charts) when the script is executed. Results are computed from the source file rather than hard-coded in this README.
 
-### Participation
+## Interpreting the measures
 
-MSSP participation is presented using January 1 program snapshots. GPDC and ACO REACH counts are presented as a separate series because they refer to a different program and reporting basis.
+`BnchmkMinExp` represents a reported financial difference relative to an MSSP benchmark; it is **not** a causal estimate of savings attributable to the program. `EarnSaveLoss` represents earned savings minus losses owed. The mean quality score is a descriptive average across ACOs with nonmissing scores. These figures should not be compared directly with ACO REACH settlements or BPCI Advanced evaluation impact estimates.
 
-![MSSP participation](figures/mssp_participation.svg)
+## Cross-model context
 
-![GPDC and ACO REACH participation](figures/reach_participation.svg)
+| Model | Unit of accountability | Core payment approach | Evidence needed for a quantitative comparison |
+| --- | --- | --- | --- |
+| MSSP | Assigned beneficiary population within an ACO | Shared savings and, for some arrangements, downside risk | Original ACO-level CMS financial and quality data (included) |
+| ACO REACH | Aligned beneficiary population within an ACO | Population-based accountability with risk options | Original CMS REACH performance data (not yet incorporated) |
+| BPCI Advanced | Defined clinical episodes | Episode-based target prices and reconciliation | Original CMS evaluation tables and methods (not yet incorporated) |
 
-### Financial results
+## Scope and limitations
 
-The MSSP chart shows reported net savings per beneficiary for 2023 and 2024. The GPDC/ACO REACH chart shows CMS savings relative to program benchmarks for 2022 and 2023. The BPCI Advanced chart summarizes published evaluation estimates by model-year period; those periods are not of equal length.
+This rebuild removes the previous hand-assembled indicator tables and their figures because they had not been fully independently verified against the source publications. It **does not claim** to have completed a numerical three-model comparison. The currently supported quantitative findings are limited to the original MSSP 2024 CMS data.
 
-![MSSP net savings per beneficiary](figures/mssp_per_capita.svg)
-
-![GPDC and ACO REACH benchmark savings](figures/reach_benchmark_savings.svg)
-
-![BPCI Advanced evaluation net savings](figures/bpci_evaluation_savings.svg)
-
-### Quality
-
-The available ACO REACH timely follow-up measure is shown for 2022 and 2023. Other quality indicators are retained in the source table but are not combined into a cross-model score.
-
-![ACO REACH timely follow-up](figures/reach_quality_trend.svg)
-
-## Interpretation and limitations
-
-The programs differ in the unit of financial accountability (ACO population versus clinical episode), attribution rules, risk arrangements, and quality measurement. These distinctions affect how their published results can be interpreted.
-
-This is a descriptive review of selected published indicators, not a comparative effectiveness study. The reporting periods and denominators are not fully aligned. BPCI Advanced results reflect evaluation estimates, whereas MSSP and ACO REACH financial results shown here reflect program reporting. The ACO REACH financial series currently ends in 2023. No causal conclusions or cross-model rankings are drawn.
+The updated analysis code and raw source file are committed. The new outputs have **not yet been executed and checked** in this environment, so the repository does not yet contain regenerated charts or result tables.
