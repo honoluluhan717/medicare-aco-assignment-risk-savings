@@ -19,6 +19,12 @@ The four **analysis-ready CSV files are included in the `data/` folder**. Their 
 
 GPDC (2021–2022) is shown as the predecessor to ACO REACH. MSSP January 1 participation snapshots are kept separate from final performance-year results.
 
+### Original CMS public-use data
+
+The repository also includes the unmodified [CMS 2024 MSSP ACO Financial and Quality Results](https://www.cms.gov/medicare/payment/fee-for-service-providers/shared-savings-program-ssp-acos/data) CSV (revised July 17, 2026) in [`data/raw/`](data/raw/). This is the original ACO-level dataset, not a manually assembled table.
+
+**Source verification status:** The four smaller analysis-ready CSV files above were assembled from reported CMS statistics and have not yet been fully checked against their original publications. The existing `analyze.py` still reads those smaller tables, not the newly added raw MSSP CSV. The cross-model analysis should not be treated as source-verified until that work is complete.
+
 ## Methods
 
 I summarized model characteristics and plotted available participation, financial, and quality measures within each program. No beneficiary-level data were used. The figures are based on published aggregate values; they do not involve independent risk adjustment or re-estimation of program savings.
